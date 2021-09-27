@@ -1,0 +1,109 @@
+**List,Map,Set,Collection
+1、List,Set都是继承自Collection接口，Map则不是
+2、List特点：元素有放入顺序，元素可重复 ，Set特点：元素无放入顺序，元素不可重复，重复元素会覆盖掉，（注意：元素虽然无放入顺序，但是元素在set中的位置是有该元素的HashCode决定的，其位置其实是固定的，加入Set 的Object必须定义equals()方法 ，另外list支持for循环，也就是通过下标来遍历，也可以用迭代器，但是set只能用迭代，因为他无序，无法用下标来取得想要的值。） 
+3.Set和List对比： 
+Set：检索元素效率低下，删除和插入效率高，插入和删除不会引起元素位置改变。 
+List：和数组类似，List可以动态增长，查找元素效率高，插入删除元素效率低，因为会引起其他元素位置改变。
+List 接口的大小可变数组的实现。实现了所有可选列表操作，并允许包括 null 在内的所有元素。
+
+迭代循环(链接存储)/for循环(顺序存储)
+迭代则更适用于链接存储的记录,迭代是先拿到找到下一个记录(.hasNext()),才可以得到记录的内容(.next())
+for循环通过下标获取指定的记录，但是其每次都必须从链表头开始查找记录，这样会影响查找的效率
+
+LinkedList、ArrayList、HashSet是非线程安全的，Vector是线程安全的;
+HashMap是非线程安全的，HashTable是线程安全的;
+StringBuilder是非线程安全的，StringBuffer是线程安全的。
+
+--List--允许包括 null 在内的所有元素
+  subList(int fromIndex, int toIndex)  返回列表中指定的 fromIndex（包括,下表可以为0）和 toIndex（不包括）之间的部分视图
+  listIterator() 返回此列表元素的列表迭代器（按适当顺序）。
+  List 接口提供了 4 种对列表元素进行定位（索引）访问方法。
+  列表（像 Java 数组一样）是基于 0 的。
+  注意，这些操作可能在和某些实现（例如 LinkedList 类）的索引值成比例的时间内执行。
+  因此，如果调用者不知道实现，那么在列表元素上迭代通常优于用索引遍历列表。
+  List 接口提供了特殊的迭代器，称为 ListIterator，除了允许 Iterator 接口提供的正常操作外
+  ，该迭代器还允许元素插入和替换，以及双向访问。
+  还提供了一个方法来获取从列表中指定位置开始的列表迭代器。
+  |
+  |
+  ListIterator
+  Method:hasNext() 以正向遍历列表时，如果列表迭代器有多个元素，则返回 true（换句话说，如果 next 返回一个元素而不是抛出异常，则返回 true）。
+   	hasPrevious()  如果以逆向遍历列表，列表迭代器有多个元素，则返回 true。
+	**如果使用 hasPrevious() 必须先使用hasNext() 进行正向遍历
+	
+--ArrayList--
+  new ArrayList<T>(int minCapacity)--默认容量为10
+  Method:ensureCapacity()如有必要，增加此 ArrayList 实例的容量，以确保它至少能够容纳最小容量参数所指定的元素数。
+  内部是可变长数组,放入的数据有序,且可以放去重复数据
+**在添加大量元素前，应用程序可以使用 ensureCapacity 操作来增加 ArrayList 实例的容量。这可以减少递增式再分配的数量。
+**多线程访问时保持同步List list = Collections.synchronizedList(new ArrayList(...));
+  ArrayList查询数据时是直接通过索引来进行查询数据,但是当进行插入和删除时，利用System.arraycopy动作，移动index后面的元素,耗时较长
+
+--LinkedList--(可以作为堆栈)
+  new LinkedList()
+  Method:descendingIterator() 返回以逆向顺序在此双端队列的元素上进行迭代的迭代器。
+  element() 获取但不移除此列表的头（第一个元素）
+  pop() 从此列表所表示的堆栈处弹出一个元素。
+  push(E e) 将元素推入此列表所表示的堆栈。
+  set(int index, E element)  将此列表中指定位置的元素替换为指定的元素。
+  LinkedList基于链表的数据结构,地址是任意的，
+  所以在开辟内存空间的时候不需要等一个连续的地址，
+  对于新增和删除操作add和remove，LinedList比较占优势。
+  LinkedList 适用于要头尾操作或插入指定位置的场景
+  因为LinkedList要移动指针,所以查询操作性能比较低。
+  LinkedList查询时用for循环来查询的，尽管使用了二分制查询，仍比ArrayList的慢,在修改数据时,是直接通过for循环直接找到index进行删除增加操作
+  
+**(ArrayList和LinkedList相比较,少量数据进行增添时,两者效率一样,数据量大时,LinkedList更占优势)**
+  
+--Vector--
+  多线程安全的,，Vector类中的方法很多有synchronized进行修饰，这样就导致了Vector在效率上无法与ArrayList相比；
+  Vector是一种老的动态数组，是线程同步的，效率很低
+  
+==HashSet==允许包括 null 在内的所有元素
+  HashSet要求放入的对象必须实现HashCode()方法，放入的对象，是以hashcode码作为标识的，
+  而具有相同内容的String对象，hashcode是一样，所以放入的内容不能重复。
+  但是同一个类的对象可以放入不同的实例
+  HashSet中的数据是无序的，可以放入null，
+  但只能放入一个null，两者中的值都不能重复，就如数据库中唯一约束 
+  HashSet是基于Hash算法实现的，其性能通常都优于TreeSet。
+  为快速查找而设计的Set，我们通常都应该使用HashSet，在我们需要排序的功能时，我们才使用TreeSet。
+
+==LinkedHashSet==
+  LinkedHashSet集合也是根据元素的hashCode值来决定元素的存储位置，但和HashSet不同的是，
+  它同时使用链表维护元素的次序，这样使得元素看起来是以插入的顺序保存的。
+
+==TreeSet==实现不是同步的,不允许放入null值
+  Set 接口是按照 equals 操作定义的
+  TreeSet 是二差树（红黑树的树据结构）实现的,Treeset中的数据是自动排好序的，不允许放入null值
+  Method:comparator()  返回对此 set 中的元素进行排序的比较器；如果此 set 使用其元素的自然顺序，则返回 null。
+  
+--HashMap--允许使用 null 值和 null 键,不保证映射的顺序
+  HashMap是非线程安全的
+  基于哈希表实现。
+  使用HashMap要求添加的键类明确定义了hashCode()和equals()[可以重写hashCode()和equals()]，
+  为了优化HashMap空间的使用，您可以调优初始容量和负载因子  
+  
+--HashTable--
+  HashTable同步的，而HashMap是非同步的，效率上比HashTable要高。HashMap允许空键值，而HashTable不允许。 
+  
+--Treemap--
+  适用于按自然顺序或自定义顺序遍历键(key)  
+  非线程安全基于红黑树实现。TreeMap没有调优选项，因为该树总处于平衡状态。 
+  
+ -------------JDK1.8新特性----------------------------
+**limit返回结果限制**
+	List inner Method:limit()
+	**Example**
+	List list = new ArrayList();
+	list.stream().limit(num)
+	parameter:
+		num:限制的个数
+	
+**forEach**
+	List inner Method:forEach()
+	**Example**
+	List list = new ArrayList();
+	list.forEach(str -> System.out.println(str));
+或者list.forEach(System.out::println);
+
+**排序sorted()**

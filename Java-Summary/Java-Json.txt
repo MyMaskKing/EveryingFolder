@@ -1,0 +1,6 @@
+Import Jar:www.json.org
+
+--Java 创建 Json--
+	JsonObject obj = new JsonObject();//创建JSON对象
+	JsonArray array = new JsonArray();//创建JSON数组
+--	

@@ -1,0 +1,217 @@
+DML[data manipulation language]语法:(数据操纵语言,主要用来对数据库的数据进行一些操作)
+insert into tableName (ColumnName) values (ColumnValues),(ColumnValues)
+update tableName set updateColumn = updateValue Where ColumnCondition = ConditionValue
+delete from tableName where ColumnCondition = ConditionValue
+
+DDL[data definition language]语法:(数据库定义语言,要是用在定义或改变表的结构，数据类型，表之间的链接和约束等初始化工作上)
+create table tableName (columnName columnType); 
+drop TABLE tableName;
+DROP DATABASE dbName;
+Alter:
+	alter table tableName add column/columns columnName colunmnType;
+	alter table tableName drop colums/columns columnName;
+	alter table tableName modify columnName newColunmType;
+	alter table tableName change columnName newColumnName newColumnType;
+添加外键:
+	alter table tableName add constraint 外键名 foreign key(当前表的列名) references 关联表(关联列名) ON UPDATE RESTRICT ON DELETE RESTRICT;
+	ON UPDATE RESTRICT:对关联表数据修改时进行制约[禁止修改关联表的关联列的数据]
+	ON DELETE RESTRICT:对关联表数据删除时进行制约[禁止删除关联表的关联列的数据]
+删除外键:
+	alter table tableName drop constraint 外键名;
+(Mysql)alter table tableName drop foreign key 外键名 ON UPDATE RESTRICT ON DELETE RESTRICT;
+		
+DCL[Data Control Language]语法:(数据库控制语言,是用来设置或更改数据库用户或角色权限的语句，包括（grant,deny,revoke等）语句。)
+	show databases;
+	show tables;
+	show grant UserName;
+	drop user UserName;
+	grant 权限 on table tableName to UserName;
+	REVOKE 权限 on table tableName from UserName;
+
+usually use function:
+	nvl(columnName, hopeValue)/[Mysql]ifnull(columnName, hopeValue)
+	case columnName when hopeCondition then hopeVal else hopeDefault end  /		case when hopeCondition then hopeVal else hopeDefault end
+	concat(str1, str2)
+	LENGTH(str) 计算str的长度,包含空格
+	subString(str, start, len) 在str从start的位置截取len位[subString('12345', 1, 2) --result: 12]
+	replace(str, oldReplaceStr, newReplaceStr)
+	ROUND(x) 四舍五入,返回结果为整数
+	cast(values as newType)转换数据values的类型/convert(values, newType)
+**Oracle**	
+(Oracle)
+		sysdate--返回当前系统日期和时间，精确到秒
+		systimestamp--返回当前系统日期和时间，精确到毫秒
+		to_date(stringDate, stringDateFormat)
+		to_char(Date, stringDateFormat)
+		TRUNC(x, len) 保留x的len位小数,不进行四舍五入计算
+**Mysql**
+(Mysql)
+		now()/sysdate()
+		TRUNCATE(x, len) 保留x的len位小数,不进行四舍五入计算
+	注释:#
+	分页:limit (startNo, divisionPages)
+		startNo:从第几条数据开始(第一天数据的索引为0,不写时默认使用divisionPages)
+		divisionPages(要取多少条数据)
+		
+mysql(5.5)所支持的日期时间类型有：DATETIME、 TIMESTAMP、DATE、TIME、YEAR。
+	DATETIME 用于表示 年月日 时分秒，是 DATE 和 TIME 的组合，并且记录的年份（见上表）比较长久。如果实际应用中有这样的需求，就可以使用 DATETIME 类型。
+	TIMESTAMP用于表示 年月日 时分秒，但是记录的年份（见上表）比较短暂。TIMESTAMP 和时区相关，更能反映当前时间。当插入日期时，会先转换为本地时区后再存放；当查询日期时，会将日期转换为本地时区后再显示。所以不同时区的人看到的同一时间是  不一样的。
+	DATE 用于表示 年月日，如果实际应用值需要保存 年月日 就可以使用 DATE。
+	...
+	
+Oracle
+	DATE可以保存日期和时间，常用日期处理都可以采用这种类型。DATE表示的日期范围可以是公元前4712年1月1日至公元9999年12月31日[Format:'century yyyy-mmm-dd hh:mm:ss']
+	TIMESTAMP精确到毫秒
+	...
+	DATE 和 TIMESTAMP 相互转换
+			|
+	to_date(to_char(systimestamp, 'yyyy-mm-dd'), 'yyyy-mm-dd')
+	to_timestamp(to_char(sysdate, 'yyyy-mm-dd'), 'yyyy-mm-dd')
+	
+**About Query**
+	select column from tableName1 Left Join tableName2 on tableName1.sameColumn = tableName2.sameColumn 左连接,以tableName1为主,查询出以tableName1所有数据
+	select column from tableName1 Right Join tableName2 on tableName1.sameColumn = tableName2.sameColumn 右连接,以tableName2为主,查询出以tableName2所有数据
+	select column from tableName1 Inner Join tableName2 on tableName1.sameColumn = tableName2.sameColumn 内连接,查询出以tableName1,tableName2交集数据
+[Oracle]select column from tableName1 Full Join tableName2 on tableName1.sameColumn = tableName2.sameColumn 全连接,查询出以tableName1,tableName2并集数据
+
+-[distinct]-
+	返回唯一不同的值,可能会包含重复值
+	select distinct columnName from tableName-------result: 结果是不同的值,和Group by类似,把distinct的columnName 进行分组,相同的数据会覆盖(有可能出现重复值)
+
+-[Union And Union All]-
+	Union:在进行表链接后会筛选掉重复的记录，所以在表链接后会对所产生的结果集进行排序运算，删除重复的记录再返回结果[并集操作,删除重复数据,并且进行默认规则的排序]
+	Union All:简单的将两个结果合并后就返回,如果返回的两个结果集中有重复的数据，那么返回的结果集就会包含重复的数据了。[仅做并集操作] 
+
+-[Minus(差集) /Intersect(交集)]-
+	Minus(差集)  两个或多个表中不同的数据集合
+	Intersect(交集)  两个或多个表中相同数据集合
+	|||Intersect(Mysql not support)
+		select tb.t1cn,
+				tb.t2cn,
+				count(1)
+		From
+		(select t1.columnName as t1cn,		------------
+				t2.columnName as t2cn					|
+		From tableName1 as t1							|
+		Left Join tableName2 as t2						|
+		on t1.columnName = t2.columnName;				|
+		Union All								tableName1和tableName2(t1,t2)的左右连接的并集tb
+		select t1.columnName as t1cn,					|
+				t2.columnName as t2cn					|
+		From tableName1 as t1							|
+		Right Join tableName2 as t2						|
+		on t1.columnName = t2.columnName;) as tb-------	|
+		Group by tb.t1cn,tb.t2cn	--------------------对tb进行分组
+		having count(1) > 1			--------------------对分组结果进行筛选(t1,t2表结果集合并不做去重复处理时重复数据为多条,count(1)>1,也可以用count(1)=1来得到没有重复的数据,也就是差集(Minus))
+																																											|		
+	|||Minus(Mysql not support)				->->->->->->	->->->	->->->	->->->	->->->	->->->	->->->	->->->	->->->	->->->	->->->	->->->	->->->	->->->	->->-><	|
+
+-[exists]-
+	当exists后的select语句返回有结果集时执行exists前的DML操作
+	select * from tableName1 where exists (select count(1) from tableName2)
+
+-[in]-
+	select * from tableName where tableName.age in (11, 12, 13);
+	
+****使用Order by,Group by会受聚合函数影响****
+	select id,name,sum(age) from tableName where condition group by age;----先按照age分组,然后把相同的age相加(sum(age)),以查询出来的分组数据的第一条为主,删除其他重复数据,并且按照age进行升序排序
+
+-[Group by]-
+	SQL执行顺序: 1.先进行Group by前面的select语句返回一个结果集
+				2.再进行group by (结果集中的字段名 )操作,对于分组的数据只能把**相同的数据放在一列**
+				3.如果select 的字段名中有聚合函数(Sum/max/min...),会对分组后的数据进行聚合函数操作
+	有where时,放在where后面-----------
+	Group by 要和聚合函数共同使用		|	
+									|	
+-[having]-							|
+	有Group by时,放在Group by后面	----|	
+	对分组的结果集进行筛选				|					
+									|
+-[order by]-默认asc					|
+	asc 升序  desc  降序				|	
+	放在group by and having后面-------
+	**Order by 放在结果集最后面**
+	select * from tableName where condition order by columnName1,columnName2,columnName3 ---(columnName1的优先级最高,也就是先按照columnName1排序后再按照columnName2排序,依次类推)
+	
+-[select into]-
+	select * into newTableName from tableName;
+[Mysql]create table newTableName(select * from oldTableName);	
+
+-[About Inner Join/Left Join/Right Join/Full Join/Across Join/Where]-
+执行顺序---数据库在通过连接两张或多张表来返回记录时，都会生成一张中间的临时表，然后再将这张临时表返回给用户。
+	join:on条件是在生成临时表时使用的条件,有Left/Right/Full/Inner使用的含义
+	Where:where条件是在临时表生成好后，再对临时表进行过滤的条件
+	
+**Sql优化**
+--更新时会导致该表的查询缓存被清空
+***DDL***
+1.字段尽可能的使用 NOT NULL约束 
+	不要以为 NULL 不需要空间，其需要额外的空间
+	下面摘自MySQL自己的文档： 
+“NULL columns require additional space in the row to record whether their values are NULL. For MyISAM tables, each NULL column takes one bit extra, rounded up to the nearest byte.” 
+如果你要保存 NULL,手动去设置它，而不是把它设为默认值。 建议用用0、特殊值或空串代替NULL值
+
+2.固定长度的表会更快
+	如果表中的所有字段都是“固定长度”的，整个表会被认为是 “static” 或 “fixed-length”
+	表中没有如下类型的字段： VARCHAR，TEXT，BLOB。
+
+3.如果需要在大字段上建立索引，可以考虑使用前缀索引。
+	ALTER TABLE table_name ADD KEY(column_name(prefix_length));
+
+4.对同一个表的多次alter操作必须合并为一次操作。
+	alter table tableName add column columnName1 columnType1,add columnName2 columnType2;
+
+5.在新建临时表时select into 效率大于 create table()
+	select * into newTableName from tableName   **TO**		create table newTableName(select * from table)
+
+***DML***
+1.count(1) 和count(*) 的区别
+answer:数据表没有主键，那么count(1)比count(*)快
+	   如果表只有一个字段的话那count(*)就是最快的啦
+	   如果有主键的话，那主键（联合主键）作为count的条件也比count(*)要快
+count(*)将返回表格中所有存在的行的总数包括值为null的行
+count(列名)将返回表格中除去null以外的所有行的总数(有默认值的列也会被计入）. 
+
+2.不要使用ORDER BY RAND() 
+ 	MySQL会不得不去执行 RAND()函数（很耗CPU时间），
+	而且这是为了每一行记录去进行，然后再对其排序。
+		
+3.用IN代替OR。SQL语句中IN包含的值不应过多,应少于1000个。					
+	IN是范围查找,MySQL内部会对IN的列表值进行排序后查找,比OR效率更高		*=*	
+	
+4.inset 中 value 和 values
+	insert into tableName (ColumnName) values (ColumnValues),(ColumnValues)
+(Mysql)VALUES插入一行,使用VALUES比较快
+	   VALUE插入多行,用VALUE比较快
+	   
+5.SQL中避免出现now()、rand()、sysdate()、current_user()等不确定结果的函数。
+
+6.UPDATE操作不要拆成DELETE操作+INSERT操作的形式，虽然功能相同，但是性能差别是很大的。
+
+7.不要对索引字段进行格式转换/函数操作
+	WHERE CONVERT(VARCHAR(10), 日期字段,120)=’2010-07-15′ **TO** WHERE日期字段〉=’2010-07-15′AND 日期字段’2010-07-16′
+	WHERE LEFT(NAME, 3)=’ABC 取出NAME的前三个字符  **TO**  WHERE NAME LIKE 'ABC%'
+	
+8.结果集比较小的情况下（比如只有几十条）用in的效率高于关联，如果结果集比较大的情况下则用join/exists的效率高于用in，	*=*
+
+[*]Query SQL Optimization(Sql优化)
+
+9.对查询进行优化，应尽量避免全表扫描，首先应考虑在 where 及 order by 涉及的列上建立索引。
+
+10..应尽量避免在 where 子句中对字段进行 null 值判断，否则将导致引擎放弃使用索引而进行全表扫描
+	select id from t where num is null; **TO**	select id from t where num=0;
+	
+11.应尽量避免在 where 子句中使用 or 来连接条件，否则将导致引擎放弃使用索引而进行全表扫描
+	select id from t where num=10 or num=20;	"**TO**"	select id from t where num=10 union all select id from t where num=20;
+	
+12.in 和 not in 也要慎用，否则会导致全表扫描(如果是连续的数值尽量用betweent and,其他情况见[SQL Optimization 8])
+	select id from t where num in(1,2,3); **TO**	select id from t where num between 1 and 3;
+	
+13.使用Like时注意,尽量使用like '123%',like '%c%'将导致全表扫描
+	select id from t where name like '%c%';  **TO**		select id from t where name like 'c%';
+	
+14.Join表的时候使用相同类型的列，并将其索引 
+	select * from tableName1 left join tableName2 on tableName1.columnName = tableName2.columnName
+	tableName1:主表
+	tableName2:关联表
+	tableName1.columnName/tableName2.columnName两个表的关联列,并且两列的数据类型一致

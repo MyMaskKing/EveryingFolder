@@ -1,0 +1,31 @@
+**Arrays**
+Method:
+	asList(T... a)  return  List<T>返回一个受指定数组支持的固定大小的列表。将数组转换为集合
+注意点:如果用基本数据类型数组int[] 来进行asList转换集合ArrayList时,因为int[]本身就是一个类型,
+所以此时的ArrayList的长度size为1
+****Example****
+	int[] arrInt = {1, 2, 3, 4};
+	Integer[] arrIte = {1, 2, 3, 4};
+	Arrays.asList(arrInt);// Size: 1
+	Arrays.asList(arrIte);// Size: 4
+并且经过Arrays.asList()转换的数组是不能进行add(),remove()
+解决办法:
+	new ArrayList<>(Arrays.asList(Objecy[] o));
+	
+	--
+	int[] arr = {...}
+	List<T> list = Arrays.asList(arr)	
+	--
+*~~*binarySearch(byte[] a, int fromIndex, int toIndex, byte key) 使用二分搜索法来搜索指定的 byte 型数组的范围，以获得指定的值。得到key值得索引
+	a - 要搜索的数组 
+    fromIndex - 要搜索的第一个元素的索引（包括） 
+    toIndex - 要搜索的最后一个元素的索引（不包括） 
+    key - 要搜索的值 
+	--
+	  int binarySearch = Arrays.binarySearch(array, 0, 3, "c");
+	--
+*~~*copyOfRange(int[] arr, int from, int to) copy arr 的指定范围,返回新数组,to 可以位于索引之外,用null填充
+*~~*copyOf(T[] original, int newLength)  复制指定的数组，截取或用 null 填充（如有必要），以使副本具有指定的长度。
+	
+	**只能对数组排序**
+*~~*sort(char[] a, int fromIndex, int toIndex)  对指定 char 型数组的指定范围按数字升序进行排序。

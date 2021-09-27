@@ -1,0 +1,164 @@
+--面向对象特征:封装,继承,多态--
+继承是面向对象的三个基本特征--封装、继承、多态的其中之一,JAVA没有指定基类的类默认是继承自Object类的
+
+--java消息服务（Java Message Service, JMS)--
+	一个允许应用创建、发送、接收和读取消息的Java API
+	
+-=--=-=-=-=-=-=-=Abstract-=-=-=-=-=-=-=-=
+关于抽象类:(abstract)
+	抽象类里面的抽象方法只能是方法体,无实现方法
+	abstract class A{
+		public abstract void test();
+	}
+	抽象类无法被实例化,只能通过继承extends来实现方法内的内容
+	When Class A is abstract,A not new instance
+	抽象类中可以有抽象方法,有抽象方法的一定是抽象类
+	
+一个接口(interface)可以继承多个接口
+	interface:B,C
+	interface A extends B,C
+
+一个类(Class)只能继承一个类,可以实现多个接口
+	Class: A,B
+	interface: C,D
+	class A extends B implments C,D
+	
+当子类继承抽象类时,子类必须实现抽象类中的抽象方法
+	abstract class A ; abstract method:TestMtd()
+	class B extends A{
+		public void TestMtd(){}
+	}
+如果不实现抽象类的方法时,需要将子类也变成抽象类
+	abstract extends A{}
+抽象类需要被类继承,所以
+					抽象方法必须为public 或者 protected
+					抽象类必须为public / abstract / final
+
+抽象接口:(abstract interface)
+	abstract interface:A ; abstract method: testMtd1()
+	interface: B
+	Class: A
+	class A extends B{
+		public void testMtd1(){}
+	}
+	
+Abstract Summary:
+	抽象类和接口性质一样,但是面向的对象不一样,抽象类面向的是抽象的对象,而接口
+	则是面向的对象的动作,两者都不会实现动作的具体内容(抽象方法的格式和接口一致),
+	接口在继承抽象接口时不用实现抽象接口中的抽象方法
+Important:接口里的方法只能是public的、abstract的。
+-=--=-=-=-=-=-=-=Abstract-=-=-=-=-=-=-=-=
+
+关于继承对象:(Extends)
+	在子类B进行初始化对象时，会隐式调用父类无参数构造函数,
+	在调用子类的方法时,如果调用到父类方法时,父类方法在子类方法中有被重写时,
+	调用的仍然是子类的方法。
+Simple:1.在继承中,子类在new对象时,总会隐式调用父类无参构造函数
+	   2.在子类调用父类方法时,如果在父类被调用的方法内有和子类方法名相同的方法体,调用的仍然是子类的方法
+	父类:fathe  子类:children
+	
+****Example****	
+	class fathe{
+		String name;
+		public father() {
+		
+		}
+		
+		public fathe(String name) {
+		
+		}
+		
+		public void testMtd1() {
+			testMth2();
+		}
+		public void testMtd2() {
+		
+		}
+	}
+	class children extends fathe{
+		String name;
+		public children() {
+		
+		}
+		public children(String name) {
+		this.name = name;
+		}
+	
+		public void testMtd1() {
+		super.testMtd1();
+		}
+		
+		public void testMth2() {
+		}
+	new children("Test");--执行顺序:1.隐式调用father(父类)的无参构造器,2.在调用children(子类)的有参构造器
+	new chidren().testMtd1();--执行顺序:1.先调用father(父类)的无参构造器,2.在调用children(子类)的无参构造器,2.然后调用子类children的testMtd1()时,3.调用父类的testMtd1时,4.父类中的testMth2()调用的是子类的test2()
+	
+关于基本数据类型:
+	整数类型:byte(8位),short(16位),int(32位),long(64位)
+	浮点类型:float(32位,23位有效尾数),double(64位,52位有效尾数)
+	字符类型:char(16位)
+	布尔类型:boolean
+****整数默认为int,小数默认为double****
+隐式类型转换:byte-->short(char)-->int-->long-->float-->double 
+显示类型转换(强制类型转换):double→float→long→int→short(char)→byte[强制类型转换所带来的结果是可能会丢失精度，如果此数值尚在范围较小的类型数值范围内，对于整型变量精度不变，但如果超出范围较小的类型数值范围内，很可能出现一些意外情况。]
+
+关于修饰词:
+	public private default protected											本类		同一个包内的类		继承类		其他类
+	public:所有地方都可以访问													……					……			……			……
+	private:只能在本类中访问,不同包的类和继承的子类中无法访问					……					X			X			X
+	default:只能在本类和同包内的类访问,不同包的类和继承的子类中无法访问			……					……			X			X
+	protect:只能在本类/同包内的类/子类中访问,不同包的类中无法访问				……					……			……			X
+
+**Object**
+	obj.getClass()	获取当前Object对象
+-[Method:]-
+	getTypeName()	return String
+						返回当前Object对象的类型(包含Object真正类型的包名)
+
+**Class**
+	Class.forName(String className).newInstance()
+					根据className来new出一个对象
+	classObject.getClass().getDeclaredFields()	return Field[]
+					获取对象classObject所有声明的字段，即包括public、private和proteced，但是不包括父类的申明字段。
+	classObject.getClass().getFields()	return Field[]
+					获取对象classObject所有声明的字段，即包括public、private和proteced，包括父类的申明字段。
+**Filed**
+	Field 提供有关类或接口的单个字段的信息，以及对它的动态访问权限。反射的字段可能是一个类（静态）字段或实例字段。
+	setAccessible();
+			将此对象的 accessible 标志设置为指示的布尔值。
+			值为 true 则指示反射的对象在使用时应该取消 Java 语言访问检查。
+			值为 false 则指示反射的对象应该实施 Java 语言访问检查。
+			对所有属性设置访问权限  当类中的成员变量为private时 必须设置此项
+	getType()	return  Class<?>
+			返回一个 Class 对象，它标识了此 Field 对象所表示字段的声明类型。
+	getName() return String
+			返回此 Field 对象表示的字段的名称
+	set(Object obj, Object value) 
+			将指定对象变量上此 Field 对象表示的字段设置为指定的新值。
+			param:	obj[对象的实例化]
+				val[向对象设定的数据]
+	
+关于TCP
+
+单例模式(饿汉式/懒汉式):
+	饿汉式:public class Test1{
+			private test1(){}
+			private static Test1 t1 = new Test1();
+			public static Test1 testMtd(){
+				return t1;
+			}
+		}
+	懒汉式:public class Test2{
+			private test2(){}
+			private static Test2 t2 = null;
+			public static Test2 testMtd(){
+				if(t2 == null) {
+				t2 = new Test2();
+				}
+				return t1;
+			}
+		}
+单例就是所有的请求都用一个对象来处理，比如我们常用的service和dao层的对象通常都是单例的
+单例，是因为没必要每个请求都新建一个对象，这样子既浪费CPU又浪费内存；
+多例则指每个请求用一个新的对象来处理，比如action
+多例，是为了防止并发问题；即一个请求改变了对象的状态，此时对象又处理另一个请求，而之前请求对对象状态的改变导致了对象对另一个请求做了错误的处理； 	

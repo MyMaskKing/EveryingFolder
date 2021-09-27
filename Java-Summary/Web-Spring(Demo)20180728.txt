@@ -1,0 +1,35 @@
+**Spring Demo**
+-[Page Data ---> Server Data]-
+	1.@RequestParam注解获取表单字段对应的参数
+	2.HttpServletRequest.getParameter(“x”)
+	
+	
+	
+-[Server Data ---> Page Data]-
+	1.	
+	public String checknameIsExist(@RequestParam("sid") String sid,Model model,HttpServletRequest request,Map map) {
+		@RequestParam("sid"):请求参数
+		Model model:Server向页面放值数据
+		HttpServletRequest:获取前台信息
+	way:1.放在model里 建议使用
+			model.addAttribute("mode", "modeValue");
+		2.放在request里
+			request.setAttribute("request", "requestValue");
+		3.放在map里
+			map.put("map", "mapvalue"); 
+			List<String> list = new ArrayList<String>();
+			list.add("1");
+			list.add("2");
+			list.add("3");
+			map.put("listmap", list);
+	}
+	2.
+	public ModelAndView checknameIsExist2(@RequestParam("sid") String sid,Model model,HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView("user");
+		mav.addObject("ModelAndView", "ModelAndViewValue");
+		mav.setViewName("user");
+
+	}
+	
+--[get the infomation in the page though the Server]--
+	1.${key}

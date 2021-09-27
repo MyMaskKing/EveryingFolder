@@ -1,0 +1,40 @@
+**Java 枚举Enum**
+	代替常量的定义,且构造方法被默认为强制私有.
+Writer Format:枚举类名后加Enum,枚举成员变量名全部大写,单词间用下划线隔开
+	
+	Enum Method:
+		compareTo(E o) return int 比较此枚举与指定对象的顺序
+		
+			***Example***
+			DAY.MONDAY.compareTo(DAY.STATUDAY)
+			return: DAY.MonDAY(DAY.MONDAY在枚举类DAY的顺序) - DAY.STATUDAY(DAY.STATUDAY在枚举类DAY的顺序)
+		
+		equals(Object other) return boolean 当指定对象等于此枚举常量时，返回 true。
+		getDeclaringClass() return Class<?> 返回与此枚举常量的枚举类型相对应的 Class 对象
+		name() return String 返回此枚举常量的名称，在其枚举声明中对其进行声明
+		ordinal() return int 返回枚举常量的序数（它在枚举声明中的位置，其中初始常量序数为零）
+Static Method: Enum.valueOf(Class<T> enumType, String name) return static<T extends Enum<T>> T 返回带指定名称的指定枚举类型的枚举常量。
+	
+	***EXample***
+	public static fianl int MONDAY = 1;
+	等价于
+	public Enum Day{MONDAY;}
+	
+	*-*-*Instance*-*-*
+	//自定义
+	public Enum Color{
+		RED("Red", 5),WINTER("Red", 2),YELLOW("Yellow", 1);
+		//构造器(添加)(Private)
+		//Get Set方法(添加)(Private)
+	}
+	
+	// Enum内部实现
+	public abstract class  Enum<E extends Enum<E>>
+        implements Comparable<E>, Serializable {
+			//枚举的构造方法，只能由编译器调用
+    protected Enum(String name, int ordinal) {
+        this.name = name;
+        this.ordinal = ordinal;
+		}
+	}
+	

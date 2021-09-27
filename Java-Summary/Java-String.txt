@@ -1,0 +1,23 @@
+**String,StringBuffer,StringBuilder**
+--String--
+  String 类代表字符串.它们的值在创建之后不能更改。
+  字符串缓冲区支持可变的字符串。因为 String 对象是不可变的，所以可以共享
+  String str = "abc";
+  等效于
+  char data[] = {'a', 'b', 'c'};
+  String str = new String(data);
+  Method:compareTo(String anotherString)  return int按字典顺序比较两个字符串。
+  endsWith(String suffix) return boolean 测试此字符串是否以指定的后缀结束。
+  getBytes()  return byte[]使用平台的默认字符集将此 String 编码为 byte 序列，并将结果存储到一个新的 byte 数组中。
+  matches(String regex) return boolean当前字符是否匹配正则表达式
+  split(String regex) return String[]根据给定正则表达式的匹配拆分此字符串。
+  replace(char oldChar, char newChar)  return String返回一个新的字符串，它是通过用 newChar 替换此字符串中出现的所有 oldChar 得到的。
+  
+--StringBuilder--不执行同步，所以速度更快(优先使用)
+  deleteCharAt(int index)  移除此序列指定位置的 char。此序列将缩短一个 char
+  append 和 insert 方法，可重载这些方法，以接受任意类型的数据。
+  每个方法都能有效地将给定的数据转换成字符串，然后将该字符串的字符追加或插入到字符串缓冲区中。append 方法始终将这些字符添加到缓冲区的末端；而 insert 方法则在指定的点添加字符。
+  
+--StringBuffer--线程安全的可变字符序列
+  字符串缓冲区容量自动增大
+  

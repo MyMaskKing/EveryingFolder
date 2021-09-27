@@ -1,0 +1,22 @@
+**java.utli-Collections**
+--emptyList()--
+	return: empty of List
+Important:返回的List 不能直接进行增删操作,只是一个单纯的空集合
+
+--Collections.addAll(Collection list,Elements ... elements)--
+	return: boolean
+Use:将可变长数据添加到list中
+Important:返回boolean
+
+--copy(List<? super T> dest, List<? extends T> src) --
+	parameter:dest<目标list> src<元List>
+Use:把src的元素浅复制到dest中(拷贝后两个list的元素（引用）不同，但是引用所指向的对象是一样的。即是两个list的每个元素指向的还是通一内存。)
+Important:无返回结果,使用时元list和目标list的长度size需要相等
+
+--binarySearch(List<? extends Comparable<? super T>> list, T key)--
+	list - 要搜索的列表。 
+	key - 要搜索的关键。
+	return: int 当前key在list的索引
+	
+--max(Collection<? extends T> coll) --
+	

@@ -1,0 +1,124 @@
+**JSP九大内置对象**
+	1.request
+		javax.servlet.httpServletRequest类型的对象
+		作用域:request对象的作用域为一次请求
+	2.response
+		response 代表的是对客户端的响应，主要是将JSP容器处理过的对象传回到客户端
+		作用域:response对象也具有作用域，它只在JSP页面内有效。
+	3.session
+		session 对象是由服务器自动创建的与用户请求相关的对象
+		保存数据格式:session对象内部使用Map类来保存数据，因此保存数据的格式为 “Key/value”。
+		作用域:每个用户都生成一个session对象，用于保存该用户的信息
+	4.application
+		 application 对象可将信息保存在服务器中，直到服务器关闭
+		 作用域:系统的“全局变量”
+	5.out
+		out 对象用于在Web浏览器内输出信息，并且管理应用服务器上的输出缓冲区
+	6.pageContext
+		${pageContext.request.contextPath}
+		pageContext 对象的作用是取得任何范围的参数,通过它可以获取 JSP页面的out、request、reponse、session、application 等对象。
+		pageContext对象的创建和初始化都是由容器来完成的
+	7.config
+		config 对象的主要作用是取得服务器的配置信息。
+		Used Method:通过 pageConext对象的 getServletConfig() 方法可以获取一个config对象。开发者可以在web.xml 文件中为应用程序环境中的Servlet程序和JSP页面提供初始化参数。
+	8.page
+		page 对象代表JSP本身,page隐含对象本质上包含当前 Servlet接口引用的变量，类似于Java编程中的 this 指针。
+		作用域:只有在JSP页面内才是合法的
+	9.exception
+		exception 对象的作用是显示异常信息
+		
+**JSTL Tag**
+	Import Method:<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+		
+	<c:out>用来输出数据对象（字符串、表达式）的内容或结果。
+		Java脚本输出时常使用的方式--<c:out value=”字符串”>	/	<c:out value=”EL表达式”>
+		属性:value--指定输出内容
+			escapeXml--指定是否将>,<,&等特殊符号进行HTML编码后输出,默认为true(输出字符串不转译)
+			default--指定value为null时输出的默认值
+	
+	<c:set>用于把某一个对象存在指定的域范围内，或者将某一个对象存储到Map或者JavaBean对象中。
+		存值，把一个值放在指定的域范围内。<c:set value=”值1” var=”name1” [scope=”page|request|session|application”]/>
+												||			等价于			||
+									<c:set var=”name2” [scope=”page|request|session|application”]>值2</c:set>
+		赋值给指定的JavaBean的属性名。相当与setter()方法。<c:set value=”值3” target=”JavaBean对象” property=”属性名”/>		
+																||		等价于		||		
+													  <c:set target=”JavaBean对象” property=”属性名”>值4</c:set>
+	   ******Example******
+	   <%@page import="javabean.Person"%
+			<% Person person=new Person(); %>
+		--%>
+		<c:set target="${person}" property="name">孤傲苍狼</c:set>
+		<c:set target="${person}" property="age">25</c:set>
+		<c:set target="${person}" property="sex">男</c:set>
+		<c:set target="${person}" property="home">中国</c:set>
+		<li>从Bean中获得的name值为：<c:out value="${person.name}"></c:out></li>
+		<li>从Bean中获得的age值为：<c:out value="${person.age}"></c:out></li>
+		<li>从Bean中获得的sex值为：<c:out value="${person.sex}"></c:out></li>
+		<li>从Bean中获得的home值为：<c:out value="${person.home}"></c:out></li>	
+		不指定范围使用EL自动查找得到值
+		
+	<c:remove>主要用来从指定的JSP范围内移除指定的变量。
+		<c:remove var=”变量名” [scope=”page|request|session|application”]/>	**scope可以不指定**
+		
+	<c:catch>用于捕获嵌套在标签体中的内容抛出的异常。
+		
+		******Example******
+		<c:catch var="errorInfo">
+			 <%--实现了一段异常代码，向一个不存在的JavaBean中插入一个值--%>
+			 <c:set target="person" property="hao"></c:set>
+		</c:catch>
+		 <%--用EL表达式得到errorInfo的值，并使用<c:out>标签输出 --%>
+		 异常：<c:out value="${errorInfo}" /><br />
+		 异常 errorInfo.getMessage：<c:out value="${errorInfo.message}" /><br />
+		 异常 errorInfo.getCause：<c:out value="${errorInfo.cause}" /><br />
+		 异常 errorInfo.getStackTrace：<c:out value="${errorInfo.stackTrace}" />
+	
+	<c:if>和程序中的if语句作用相同，用来实现条件控制。
+		<c:if test="testCondition" [var="varName"] [scope="{page|request|session|application}"]>
+    　　　　　　标签体内容
+　　　　</c:if>
+		
+		******Example******
+		<c:if test="${1==1}"/test="true" var="v1"></c:if>
+		<c:out value="${v1}"></c:if>
+		
+		testCondition:判断条件return boolean
+		varName:标记名字
+		scope：范围
+		
+	<c:choose>、<c:when>和<c:otherwise>构造类似 “if-else if-else” 的复杂条件判断结构。
+		<c:choose>内没有额外的属性		==case			-----
+		<c:when test="return boolean">	==when			   	|等价于java中的case,when,default
+		<c:otherwise>>内没有额外的属性	==default		----
+		
+	<c:forEach>根据循环条件遍历集合（Collection）中的元素。
+		<c:forEach var=”name” items=”Collection” varStatus=”StatusName” begin=”begin” end=”end” step=”step”>
+		var设定变量名用于存储从集合中取出元素
+		items指定要遍历的集合。
+		varStatus设定变量名，该变量用于存放集合中元素的信息。 ----------- 
+		begin、end用于指定遍历的起始位置和终止位置（可选）				|
+		step指定循环的步长。(每step个遍历一次)							|
+																	|
+													varStatus的4个状态:index (int) 当前循环的索引值
+																	  count (int) 循环的次数
+																	  frist (boolean) 是否为第一个位置
+																	  last (boolean) 是否为最后一个位置
+		******Example******
+		<%List list = new ArrayList(); application.setAttribute("list", list)%>
+		<c:forEach items="${applicationScope.list }" var="ll" varStatus="s" step="3">
+				<c:out value={ll}></c:out>	<!-- 取出集合中的每一个值 -->
+				<c:out value={c.index}></c:out>	<!-- 得到当前元素在集合中的索引位置 -->
+		</c:forEach>
+			
+	<c:forTokens>用于浏览字符串，并根据指定的字符将字符串截取。------类似一遍历jiava数组(用法和<c:forEach>大致相同)
+		<c:forTokens items=”strigOfTokens” delims=”delimiters” [var=”name” begin=”begin” end=”end” step=”len” varStatus=”statusName”] >本体内容</c:forTokens>
+		delims指定使用的分隔符。
+		
+	<c:import>
+		
+	<c:url>用于在JSP页面中构造一个URL地址，其主要目的是实现URL重写、
+		<c:url value=”value” [var=”name”] [scope=”page|request|session|application”] [context=”context”]>
+    　　		<c:param name=”参数名” value=”值”>
+		</c:url>
+			
+	<c:param>嵌套在<c:import>、<c:url>或<c:redirect>标签内，为这些标签所使用的URL地址附加参数。自动对参数值进行URL编码

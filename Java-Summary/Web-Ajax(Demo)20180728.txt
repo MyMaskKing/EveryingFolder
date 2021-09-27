@@ -1,0 +1,21 @@
+**Ajax**
+--[Page]--
+	$.ajax({
+			type : "post",
+			url : "<%=request.getContextPath()%>/login/accountCheck",
+			data : {"account": accountVal},
+			cache: false,
+			success:function(data){
+				alert(data);
+			}
+		})
+
+--[Server]--
+	@RequestMapping("accountCheck")
+	@ResponseBody
+	public String accountCheck(@RequestParam(value = "account") String account) {
+		return "123";
+	}
+	@ResponseBody:将返回数据以json形式返回
+	@RequestParam:获取请求参数(需要指定Key)
+	@RequsetBody:获取请求参数

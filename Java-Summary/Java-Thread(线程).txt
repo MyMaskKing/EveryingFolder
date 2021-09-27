@@ -1,0 +1,324 @@
+*[3]*The difference of Thread and Runnable 
+answer:Runnable can share the same data,but thread can not.
+
+1) 什么是线程？
+线程是操作系统能够进行运算调度的最小单位，它被包含在进程之中，是进程中的实际运作单位。
+程序员可以通过它进行多处理器编程，你可以使用多线程对运算密集型任务提速。
+比如，如果一个线程完成一个任务要100毫秒，那么用十个线程完成改任务只需10毫秒。
+Java在语言层面对多线程提供了卓越的支持，它也是一个很好的卖点
+
+2) 线程和进程有什么区别？
+线程是进程的子集，一个进程可以有很多线程，每条线程并行执行不同的任务。
+不同的进程使用不同的内存空间，而所有的线程共享一片相同的内存空间。
+别把它和栈内存搞混，每个线程都拥有单独的栈内存用来存储本地数据。
+
+3) 如何在Java中实现线程？
+在语言层面有两种方式。java.lang.Thread 类的实例就是一个线程但是它需要调用java.lang.Runnable
+接口来执行，由于线程类本身就是调用的Runnable接口所以你可以继承java.lang.Thread 类
+或者直接调用Runnable接口来重写run()方法实现线程
+
+6) Thread 类中的start() 和 run() 方法有什么区别？
+这个问题经常被问到，但还是能从此区分出面试者对Java线程模型的理解程度。
+start()方法被用来启动新创建的线程，而且start()内部调用了run()方法，
+这和直接调用run()方法的效果不一样。当你调用run()方法的时候，只会是在原来的线程中调用，
+没有新的线程启动，start()方法才会启动新线程。
+
+7) Java中Runnable和Callable有什么不同？
+Runnable和Callable都代表那些要在不同的线程中执行的任务。
+Runnable从JDK1.0开始就有了，Callable是在JDK1.5增加的。
+它们的主要区别是Callable的 call() 方法可以返回值和抛出异常，
+而Runnable的run()方法没有这些功能。Callable可以返回装载有计算结果的Future对象。
+
+8) Java中CyclicBarrier 和 CountDownLatch有什么不同？
+CyclicBarrier 和 CountDownLatch 都可以用来让一组线程等待其它线程。
+与 CyclicBarrier 不同的是，CountdownLatch 不能重新使用
+
+9) Java内存模型是什么？
+
+Java内存模型规定和指引Java程序在不同的内存架构、CPU和操作系统间有确定性地行为。它在多线程的情况下尤其重要。
+Java内存模型对一个线程所做的变动能被其它线程可见提供了保证，它们之间是先行发生关系。
+这个关系定义了一些规则让程序员在并发编程时思路更清晰。比如，先行发生关系确保了：
+
+    线程内的代码能够按先后顺序执行，这被称为程序次序规则。
+    对于同一个锁，一个解锁操作一定要发生在时间上后发生的另一个锁定操作之前，也叫做管程锁定规则。
+    前一个对volatile的写操作在后一个volatile的读操作之前，也叫volatile变量规则。
+    一个线程内的任何操作必需在这个线程的start()调用之后，也叫作线程启动规则。
+    一个线程的所有操作都会在线程终止之前，线程终止规则。
+    一个对象的终结操作必需在这个对象构造完成之后，也叫对象终结规则。
+    可传递性
+
+10) Java中的volatile 变量是什么？*(成员/局部变量:方法内的变量,再本方法外无法调用;全局变量:Class内,方法外,可在方法内部访问)
+volatile是一个特殊的修饰符，只有成员变量才能使用它。在Java并发程序缺少同步类的情况下，
+多线程对成员变量的操作对其它线程是透明的。
+volatile变量可以保证下一个读取操作会在前一个写操作之后发生，就是上一题的volatile变量规则。
+
+11) 什么是线程安全？Vector是一个线程安全类吗？ （详见这里)
+如果你的代码所在的进程中有多个线程在同时运行，而这些线程可能会同时运行这段代码。
+如果每次运行结果和单线程运行的结果是一样的，而且其他的变量的值也和预期的是一样的，
+就是线程安全的。
+一个线程安全的计数器类的同一个实例对象在被多个线程使用的情况下也不会出现计算失误。
+很显然你可以将集合类分成两组，线程安全和非线程安全的。
+Vector 是用同步方法来实现线程安全的, 而和它相似的ArrayList不是线程安全的。
+
+13) Java中如何停止一个线程？
+Java提供了很丰富的API但没有为停止线程提供API。
+JDK 1.0本来有一些像stop(), suspend() 和 resume()的控制方法但是由于潜在的死锁威胁因此在后续的JDK版本中他们被弃用了，
+之后Java API的设计者就没有提供一个兼容且线程安全的方法来停止一个线程。
+当run() 或者 call() 方法执行完的时候线程会自动结束,如果要手动结束一个线程，
+你可以用volatile 布尔变量来退出run()方法的循环或者是取消任务来中断线程。
+
+14)Java中notify 和 notifyAll有什么区别？
+多线程可以等待单监控锁，Java API 的设计人员提供了一些方法当等待条件改变的时候通知它们，
+但是这些方法没有完全实现。notify()方法不能唤醒某个具体的线程，
+所以只有一个线程在等待的时候它才有用武之地。
+而notifyAll()唤醒所有线程并允许他们争夺锁确保了至少有一个线程能继续运行。
+
+15) 什么是ThreadLocal变量？
+ThreadLocal是Java里一种特殊的变量。
+每个线程都有一个ThreadLocal就是每个线程都拥有了自己独立的一个变量，竞争条件被彻底消除了。
+它是为创建代价高昂的对象获取线程安全的好方法，
+比如你可以用ThreadLocal让SimpleDateFormat变成线程安全的，
+因为那个类创建代价高昂且每次调用都需要创建不同的实例所以不值得在局部范围使用它，
+如果为每个线程提供一个自己独有的变量拷贝，将大大提高效率。
+首先，通过复用减少了代价高昂的对象的创建个数。
+其次，你在没有使用高代价的同步或者不变性的情况下获得了线程安全。
+线程局部变量的另一个不错的例子是ThreadLocalRandom类，
+它在多线程环境中减少了创建代价高昂的Random对象的个数。
+
+16)什么是FutureTask？
+在Java并发程序中FutureTask表示一个可以取消的异步运算。
+它有启动和取消运算、查询运算是否完成和取回运算结果等方法。
+只有当运算完成的时候结果才能取回，如果运算尚未完成get方法将会阻塞。
+一个FutureTask对象可以对调用了Callable和Runnable的对象进行包装，
+由于FutureTask也是调用了Runnable接口所以它可以提交给Executor来执行。
+
+17)Java中的同步集合与并发集合有什么区别？
+同步集合与并发集合都为多线程和并发提供了合适的线程安全的集合，
+不过并发集合的可扩展性更高。
+在Java1.5之前程序员们只有同步集合来用且在多线程并发的时候会导致争用，
+阻碍了系统的扩展性。
+Java5介绍了并发集合像ConcurrentHashMap，
+不仅提供线程安全还用锁分离和内部分区等现代技术提高了可扩展性。
+
+18) Java中堆和栈有什么不同？(sample:栈用来放置数据,堆用来放对象.)
+栈是一块和线程紧密相关的内存区域。
+每个线程都有自己的栈内存，用于存储本地变量，方法参数和栈调用，
+一个线程中存储的变量对其它线程是不可见的。
+而堆是所有线程共享的一片公用内存区域。
+对象都在堆里创建，为了提升效率线程会从堆中弄一个缓存到自己的栈，
+如果多个线程使用该变量就可能引发问题，这时volatile 变量就可以发挥作用了，
+它要求线程从主存中读取变量的值。
+
+19) 什么是线程池？ 为什么要使用它？
+创建线程要花费昂贵的资源和时间，如果任务来了才创建线程那么响应时间会变长，
+而且一个进程能创建的线程数有限。
+为了避免这些问题，在程序启动的时候就创建若干线程来响应处理，它们被称为线程池，
+里面的线程叫工作线程。
+从JDK1.5开始，Java API提供了Executor框架让你可以创建不同的线程池。
+比如单线程池，每次处理一个任务；数目固定的线程池或者是缓存线程池
+（一个适合很多生存期短的任务的程序的可扩展线程池）。
+
+20)如何避免死锁？
+Java多线程中的死锁
+死锁是指两个或两个以上的进程在执行过程中，因争夺资源而造成的一种互相等待的现象，
+若无外力作用，它们都将无法推进下去。
+这是一个严重的问题，因为死锁会让你的程序挂起无法完成任务，死锁的发生必须满足以下四个条件：
+
+    互斥条件：一个资源每次只能被一个进程使用。
+    请求与保持条件：一个进程因请求资源而阻塞时，对已获得的资源保持不放。
+    不剥夺条件：进程已获得的资源，在末使用完之前，不能强行剥夺。
+    循环等待条件：若干进程之间形成一种头尾相接的循环等待资源关系。
+
+避免死锁最简单的方法就是阻止循环等待条件，
+将系统中所有的资源设置标志位、排序，规定所有的进程申请资源必须以一定的顺序（升序或降序）做操作来避免死锁。
+
+21)Java中活锁和死锁有什么区别？
+活锁和死锁类似，不同之处在于处于活锁的线程或进程的状态是不断改变的，
+活锁可以认为是一种特殊的饥饿。一个现实的活锁例子是两个人在狭小的走廊碰到，
+两个人都试着避让对方好让彼此通过，但是因为避让的方向都一样导致最后谁都不能通过走廊。
+简单的说就是，活锁和死锁的主要区别是前者进程的状态可以改变但是却不能继续执行。
+
+22)怎么检测一个线程是否拥有锁？
+java.lang.Thread中有一个方法叫holdsLock()，它返回true如果当且仅当当前线程拥有某个具体对象的锁。
+
+23)Java中synchronized 和 ReentrantLock 有什么不同？
+Java在过去很长一段时间只能通过synchronized关键字来实现互斥，它有一些缺点。
+比如你不能扩展锁之外的方法或者块边界，尝试获取锁时不能中途取消等。
+Java 5 通过Lock接口提供了更复杂的控制来解决这些问题。
+ReentrantLock 类实现了 Lock，
+它拥有与 synchronized 相同的并发性和内存语义且它还具有可扩展性。
+
+24)有三个线程T1，T2，T3，怎么确保它们按顺序执行？
+在多线程中有多种方法让线程按特定顺序执行，
+你可以用线程类的join()方法在一个线程中启动另一个线程，
+另外一个线程完成该线程继续执行。
+为了确保三个线程的顺序你应该先启动最后一个(T3调用T2，T2调用T1)，
+这样T1就会先完成而T3最后完成。
+
+25)Thread类中的yield方法有什么作用？
+Yield方法可以暂停当前正在执行的线程对象，
+让其它有相同优先级的线程执行。
+它是一个静态方法而且只保证当前线程放弃CPU占用而不能保证使其它线程一定能占用CPU，
+执行yield()的线程有可能在进入到暂停状态后马上又被执行。
+
+26)Java中ConcurrentHashMap的并发度是什么？
+ConcurrentHashMap把实际map划分成若干部分来实现它的可扩展性和线程安全。
+这种划分是使用并发度获得的，它是ConcurrentHashMap类构造函数的一个可选参数，默认值为16，
+这样在多线程情况下就能避免争用。
+
+27)多线程中的忙循环是什么?
+忙循环就是程序员用循环让一个线程等待，
+不像传统方法wait(), sleep() 或 yield() 它们都放弃了CPU控制，
+而忙循环不会放弃CPU，它就是在运行一个空循环。
+这么做的目的是为了保留CPU缓存，在多核系统中，
+一个等待线程醒来的时候可能会在另一个内核运行，这样会重建缓存。
+为了避免重建缓存和减少等待重建的时间就可以使用它了
+
+28) Java多线程中调用wait() 和 sleep()方法有什么不同？
+Java程序中wait 和 sleep都会造成某种形式的暂停，它们可以满足不同的需要。
+wait()方法用于线程间通信，如果等待条件为真且其它线程被唤醒时它会释放锁，
+而sleep()方法仅仅释放CPU资源或者让当前线程停止执行一段时间，但不会释放锁
+
+-------------Thread 详细介绍-------------------------------
+	线程的原理就是开启不同的任务,如果是实现implement Runnable接口,可以实现数据的共享.
+	***Example***
+	实现Runnable接口的线程:TR		class TR1 implements Runnable{}
+	
+	Thread thread1 = new Thread(TR);		-----
+	Thread thread2 = new Thread(TR);			|
+	thread1.start();							|开启多个线程共同去做一个任务
+	thread2.start();----------------------------
+常用方法:
+		getContextClassLoader() return ClassLoader 返回此Thread的上下文ClassLoader。 
+		getPriority() return int 返回此线程的优先级。 
+		interrupt() return void 中断这个线程。 
+static 	interrupted()  return boolean 测试当前线程是否中断。
+		isInterrupted() return boolean 测试这个线程是否被中断。 
+		join()  return void 等待这个线程死亡。 
+		setPriority(int newPriority)  return void 更改此线程的优先级。
+static  yield()  return void 对调度程序的一个暗示，即当前线程愿意产生当前使用的处理器。
+
+-[-[-关于线程锁(synchronized/lock)-]-]-
+synchronized/lock:
+			synchronized拿到锁后其他线程无法执行,进入等待,一但被锁的代码块出现阻塞情况下,
+			其他线程就会无限制等待下去.
+			lock拥有上锁lock()和解锁unlock()方法,可以规定某个线程等待固定时间后自动解锁
+
+-[-synchronized-]-
+	同步方法，锁对象是this；
+	同步静态方法，锁对象是字节码.class；\
+	同步代码块，锁对象是任意对象，但必须是同一个对象
+	同步不具有继承性
+
+	synchronized在方法体
+		public synchronized void testMtd() {}
+	synchronized对象
+		synchronized(Obj){}
+	
+-[-[-Lock-]-]-同步锁接口
+	Method:lock() 获取锁
+			tryLock(long time) 尝试获取锁 
+			unock() 释放锁
+			newCondition()  获取锁的Condition
+			isLocked() 查询此锁是否由任意线程保持。
+			
+	**Example**
+		Lock lock = new ReentrantLock();
+
+		public void doSth(){
+			lock.lock();
+			try {
+				// 执行某些操作
+			}finally {
+				lock.unlock();
+			}
+		}	
+			
+--[-死锁原理-]--
+	当两个线程同时共用两个(多个)对象或资源时,当第一个线程去做锁第一个对象或资源后,
+	第一个线程可能因为sleep()或者某些因素而没来的及去上第二个锁,这时候第二个线程将
+	第二个对象或资源上锁,这时候第一个线程醒来要去锁第二个对象或资源时无法上锁,这样就
+	造成了第一个线程拿着第一个对象的锁,第二个线程拿着第二个线程的锁,两个线程都无法继续
+	向下执行.
+	
+	**Example**
+	public LockTest{
+		public static Object lockObj1 = new Object();
+		public static Object lockObj2 = new Object();
+		main{
+			Thread t1 = new Thread(new LockCls1());
+			Thread t2 = new Thread(new LockCls2());
+			t1.start();
+			t2.start();
+		}
+		
+	}
+	class LockCls1 extends Thread implement Runnable{
+		public LockCls{
+			
+		}
+	
+		public void run() {
+			while(true){
+				synchronized(LockTest.lockObj1){
+					syso("Join Lock One")
+					try{
+						Thread.sellep(2000);
+					}catch(Exception e){}
+						synchronized(LockTest.lockObj2){
+						syso("Join Lock Two")	
+						}
+					}
+				}
+		}
+	}
+	
+	class LockCls2 extends Thread implement Runnable{
+		public LockCls{
+			
+		}
+	
+		public void run() {
+			while(true){
+				synchronized(LockTest.lockObj2){
+					syso("Join Lock One")
+					try{
+						Thread.sellep(1000);
+					}catch(Exception e){}
+						synchronized(LockTest.lockObj1){
+						syso("Join Lock Two")	
+						}
+					}
+				}
+		}
+	}
+	
+-[-[-关于线程池-]-]-
+	//创建出容量为10的线程池
+	ExecutorService pool = Executors.newFixedThreadPool(10);
+
+	//表示创建了容量为1的线程池
+	ExecutorService pool2 = Executors.newSingleThreadExecutor();
+	//创建容量没有限制的线程池
+	ExecutorService pool3 = Executors.newCachedThreadPool();
+	//创建固定数量的线程池（指定数量）   底层使用带有延迟和周期性的执行任务机制
+	ScheduledExecutorService pool4 = Executors.newScheduledThreadPool(10); 
+
+-[-[-线程安全修饰词(volatile)-]-]-
+	Volatile 变量虽然使用简单，有时候开销也比较低，但是同时它的同步性较差，而且其使用也更容易出错
+	同步块 synchronize
+	变量 volatile
+	
+
+*[-]*关于停止线程[----]
+1.暴力停止:Thread.stop();--stop()方法以及作废，因为如果强制让线程停止有可能使一些清理性的工作得不到完成。另外一个情况就是对锁定的对象进行了解锁，导致数据得不到同步的处理，出现数据不一致的问题。
+2.调用interrupt方法是在当前线程中打了一个停止标志，并不是真的停止线程。
+----判断线程是否停止状态
+----this.interrupted(): 测试当前线程是否已经中断；[difference:此方法需要将主线程打上停止标志后才会为true(Thread.currrntThread.interrupt),第二次调用此方法为清除停止标记]
+----this.isInterrupted(): 测试线程是否已经中断；[difference:此方法在打上停止标记后显示结果为true]
+3. 能停止的线程--异常法
+throw new InterruptedException();
+4.将方法interrupt()与return结合使用也能实现停止线程的效果：
+--先使用thread.interrupt打上停止标记
+--再在线程的run()里判断thread.isInterrupted
+--返回结果为true则return

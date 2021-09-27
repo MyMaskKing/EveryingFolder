@@ -1,0 +1,311 @@
+----action继承一个指定的父类:com.opensymphony.xwork2.ActionSupport----
+
+****servlet是线程不安全的,因为servlet是单例。****
+****struts2框架中的action是线程安全的,因为每次访问都会创建一个新的Action对象.
+	所有在action里面可以随便的定义成员变量(只有成员变量才有线程安全的问题)	****
+
+Struts2请求响应流程：
+----（1）  客户端（Client）向Action发用一个请求（Request）
+	（2）  Container通过web.xml映射请求，并获得控制器（Controller）的名字
+	（3）  容器（Container）调用控制器（StrutsPrepareAndExecuteFilter或FilterDispatcher）。在Struts2.1以前调用FilterDispatcher，Struts2.1以后调用StrutsPrepareAndExecuteFilter
+	（4）  控制器（Controller）通过ActionMapper获得Action的信息
+	（5）  控制器（Controller）调用ActionProxy
+	（6）  ActionProxy读取struts.xml文件获取action和interceptor stack的信息。
+	（7）  ActionProxy把request请求传递给ActionInvocation
+	（8）  ActionInvocation依次调用action和interceptor
+	（9）  根据action的配置信息，产生result
+	（10） Result信息返回给ActionInvocation
+	（11） 产生一个HttpServletResponse响应
+	（12） 产生的响应行为发送给客服端。
+
+Struts-Struts 数据交互:
+----<result>标签体中不仅仅可以通过通配符来配置映射资源，还可以通过Action中的属性，在struts.xml中使用ognl表达式获取值来配置映射资源。
+	For Example:
+			|------------------------------------------------------------------
+			|	public  class LoginAction{
+			|		private User user ;
+			|
+			|		//提供get ,set方法
+			|		public String login(){
+			|			return "success" ;
+			|				  }
+			|	}
+			|	
+			|	<action name="login" class="com.struts.action.LoginAction">
+			|		<result type="redirect-action">
+			|			/WEB-INF/list.jsp?uname=${user.username}
+			|		</result>
+			|	</action>
+			|--------------------------------------------------------------------
+	
+Jsp-Struts 数据交互:
+----第一种情况:
+     例如:通过页面要把id=1 name=tom age=20这三个参数传给action
+     
+     1.action里面定义三个成员变量id name age,这个三个变量的名字一定要和所传变量的名字一致.
+     2.提供get/set方法
+     3.将来页面把这三个参数传过来的时候,struts2框架会自动的帮我们把这个三个参数值放action中的三个属性里面.(同时还做了类型的转换)
+     注意:这个工作其实是由defaultStack这个拦截器栈里面的拦截器来完成了.
+
+     传值完成之后,我们只要在execute方法中去直接使用就可以了,不需要做其他事情.
+	 
+	 第二种情况:
+        在接收到页面传值的时候,还可以让struts2框架直接帮我们把这些接收到的值封装到一个javabean对象里面.
+     
+     1.action中定义一个User类型的变量user,User类中有三属性值,id name age,同时User类中还有get/set方法
+
+     2.action中给这个user属性提供get/set方法
+
+     3.页面向action传值的时候,参数的名字要写成user.id=1  user.name=tom  user.age=20
+
+     将来接收到这个参数值以后,struts2框架会帮我们去创建一个User对象,并且把所传参数的三个值封装到对象的三个属性里面,最后把这个封装好的对象放到action的user属性中
+
+	 第三种情况：[不推荐使用]
+		在struts中获取servlet原型对象request[通过ActionContext获取参数]
+		
+		Map<String,Object> request = ActionContext.getContext().getParameters(); 
+		Map<String,Object> session = ActionContext.getContext().getSession() ;
+		Map<String,Object> application = ActionContext.getContext().getApplication() ;
+
+		HttpServletRequest request = ServletActionContext.getRequest() ;
+		HttpServletResponse response = ServletActionContext.getResponse() ;
+		ServletContext  sc = ServletActionContext.getServletContext() ;
+
+		Object value = request.getParameter(key)
+	 
+	 第四种情况:
+		模型驱动 Class Action implements ModelDriven<User>
+		在控制层添加成员属性Userprivate User user ; 并提供getModel方法
+		
+
+	 
+Struts-Jsp 数据交互:
+----OGNL表达式 Object Graph Navigation Language(对象图导航语言)
+	 注意:OGNL只能写在struts2标签的属性值中.
+	 
+====jsp页面中引入struts2标签:<%@taglib uri="/struts-tags" prefix="s" %>
+	${} 是 EL 表达式的语法，%{} 是 OGNL 表达式的语法。
+	
+	For example: (取到ValueStack中属性值或方法)
+				<s:property value="name"/><br>
+				<s:property value="user.sayHello2('zhangsan')"/><br>
+	
+	For example: (取到ActionContext中value值OrMethod)
+				<s:property value="#user.getName()"/><br>
+				<s:property value="new com.briup.pojo.User().getId()"/><br>
+				
+	For example: (调用类的静态方法/静态属性)
+				<!-- 格式:@...@... -->
+				 <!-- 
+					 第一个@后面要加上类的全名
+						如果没有写,默认值是: java.lang.*
+						虽然有默认值,但是还是要求任何时候都写明确这个值.
+					 第二个@后面要加上静态属性/静态方法的名字
+				
+				  -->
+				<s:property value="@@PI"/><br>
+				<s:property value="@java.lang.Math@PI"/><br>
+
+Struts2 拦截器:
+----实现拦截器的方式：
+	1、实现Interceptor接口                (对类进行拦截)
+	2、继承AbstractInterceptor类       (对类进行拦截)
+	3、实现MethodFilterInterceptor类 (支持对方法的拦截)
+	
+	For Example:
+	---------------------------------------------------------------------------------------
+	| public class ActionInterceptor extends MethodFilterInterceptor {
+	|
+	| protected String doIntercept(ActionInvocation invocation) throws Exception {
+	|	//LoginAction loginAction = (LoginAction)invocation.getAction() ;
+	|	System.out.println("111111");
+	|	String res = invocation.invoke() ;
+	|	System.out.println("22222");
+	|	return res;
+	| }
+	|
+	| }
+	|
+	|<interceptors>
+    |       <interceptor name="myInterceptor" class="com.struts.interceptor.ActionInterceptor" />
+    |       <!-- 自定义拦截栈-->
+    |      <interceptor-stack name="myStack">
+	|			<!-- 默认拦截器栈-->
+	|			<interceptor-ref name="defaultStack" />
+	|			<!-- 引入自定义拦截器-->
+	|			<interceptor-ref name="myInterceptor" />
+    |       </interceptor-stack>
+	|</interceptors>
+	|
+	|	<action name="login" class="com.struts.action.LoginAction">
+	|		<result type="redirect">/list.jsp</result>
+	|		<interceptor-ref name="myStack" />
+	|	</action>
+	|
+	---------------------------------------------------------------------------------------
+
+全局映射:
+		------------------------------------------------------------------------------
+		|<global-results>
+		|	<result name="error">/error.jsp</result>
+		|</global-results>
+		|注意：当action指定了同样的结果类型的时候，会优先使用action中
+		|配置的映射关系。覆盖全局结果映射。
+		|
+		|------------------------------------------------------------------------------------
+		|**struts2允许用户定义一个默认的action，当用户的请求在容器中都找不到对应action的时候，系统将默认使用默认action完成处理请求。
+		|<default-action-ref name="defaultAction" />
+		|
+		|<action name="defaultAction" class="com.test.DefaultAction">
+		|	<result>/WEB-INF/default.jsp</result>
+		|</action>
+		|-----------------------------------------------------------------------------------
+		|**配置全局异常处理
+		|<global-exception-mappings>
+		|	  <exception-mapping result="error" exception="java.lang.Exception"></exception-mapping>
+		|</global-exception-mappings>
+		|--------------------------------------------------------------------------------------
+		
+		
+	
+防止表单重复提交：
+----1、在jsp中添加<%@taglib uri="/struts-tags" prefix="s" %>
+	2、表单中添加 <s:token></s:token>标签
+	3、struts配置文件中配置拦截器
+			 <interceptors>
+		<interceptor-stack name="myStack">
+			<interceptor-ref name="token" />
+			<interceptor-ref name="defaultStack" />
+		</interceptor-stack>
+			 </interceptors>
+
+			<action name="login" class="com.struts.action.LoginAction">
+		   <result type="redirect">/list.jsp</result>
+		   <result name="invalid.token">/token.jsp</result>
+		   <interceptor-ref name="myStack" />
+			</action>
+
+				
+Struts framework tag:
+----<s:debug></s:debug>标签:
+	  用来显示action传到页面中的值(调试代码时候常用到的)
+   
+	<s:property value=""/>标签:
+		  取值并在页面中输出内容
+	   
+	<s:if>     标签:
+	<s:elseif> 标签:
+	<s:else >  标签:
+	<s:iterator>标签:
+	注意:每次遍历接收到的集合中的对象,
+	都会默认的放到ValueStack和ActionContext里面,
+	所以每次遍历拿到一个对象后,
+	我们可以从这个两个地方取值(debug标签中,在ValueStack中看不到它放进去的这个对象,在ActionContext中可以看到).
+	遍历List类型集合:
+		
+      value属性值是要遍历的集合(可以从ValueStack或者ActionContext里面取到这个集合),id属性值表示每次遍历到的对象用什么名字的对象来接收.
+      <s:iterator value="list" id="u">
+		//从ValueStack中取遍历到的对象属性值。
+   		<s:property value="id"/>  
+   		<s:property value="name"/>  
+   		<s:property value="age"/>
+   		<br>
+      </s:iterator>
+      或者:
+      <s:iterator value="list" id="u">
+	     //从ActionContext中取遍历到的对象属性值。
+   	      <s:property value="#u.id"/>  
+   	      <s:property value="#u.name"/>  
+   	      <s:property value="#u.age"/>
+   	      <br>
+      </s:iterator>
+
+      遍历Map类型的集合:
+		注意:每次遍历Map类型的集合拿到的时候一个键值对,这样的键值对有俩个固定的属性:key value,分别拿到对应的key和value值.
+			<s:iterator value="map" id="entry">
+				//从ValueStack中取遍历到的对象属性值。
+			<s:property value="key"/>  -->
+			<s:property value="value.id"/>
+			<s:property value="value.name"/>
+			<s:property value="value.age"/>
+			<br>
+		</s:iterator>
+		<br>
+   	
+		<s:iterator value="map" id="entry">
+				//从ActionContext中取遍历到的对象属性值。
+			<s:property value="#entry.key"/>  -->
+			<s:property value="#entry.value.id"/>
+			<s:property value="#entry.value.name"/>
+			<s:property value="#entry.value.age"/>
+			<br>
+		</s:iterator>
+
+	 <s:date>标签 处理日期
+		<s:date name="birth" format="yyyy年MM月dd日"/>
+		<s:date name="birth" format="yyyy年MM月dd日 hh:mm:ss"/><br>
+        <s:date name="birth" nice="false"/>
+        <s:date name="birth" nice="true"/>
+
+     <s:from>表单元素 注意:如果加上面命名空间namespace属性,则action属性值中不需要加.action后缀,否则自己手动加后缀.action
+		<s:form action="ognl_test" namespace="/test">
+            <s:hidden name="id" value="1"></s:hidden>
+            <s:textfield label="用户名" name="username" tooltip="你的名字"></s:textfield>
+            <s:password label="密码" name="password"></s:password>
+            <s:textarea label="备注" name="rmake" tooltip="自我介绍"></s:textarea>
+            <s:file label="上传文件" name="file"></s:file>
+             
+            <s:select label="学历" name="edu" list="#{'1':'博士','2':'硕士'}" ></s:select>
+             
+            <!-- value的值是选默认中的 -->
+            <s:select list="{'java','oracle'}" value="java"></s:select>
+             
+            <!-- 单个的checkbox-->
+            <s:checkbox label="爱好1" fieldValue="11" name="like"></s:checkbox>
+            <s:checkbox label="爱好2" fieldValue="22" name="like"></s:checkbox>
+             
+            <!-- 多个checkbox -->
+            <s:checkboxlist label="喜欢的编程语言" name="box1" list="{'java','css','html','struts2'}"  value="{'css','struts2'}"></s:checkboxlist>
+         
+            <!-- map集合前要加# -->
+            <s:checkboxlist label="喜欢的编程语言" name="box2" list="#{1:'java',2:'css',3:'html',4:'struts2',5:'spring'}"  value="{1,2}"></s:checkboxlist>
+                     
+            <!-- radio -->       
+            <s:radio label="性别" name="sex1" list="{'男','女'}" value="'女'" ></s:radio>
+			<s:radio label="性别" name="sex2" list="#{1:'男',2:'女'}" ></s:radio>      
+                             
+            <s:submit value="提交"></s:submit>
+        </s:form>
+		
+校验器:
+----1、继承ActionSupport , 重写validate方法，校验异常的数据通过addFieldError()方法添加信息。
+	对某一个方法进行校验，提供validateXxx() 进行校验  Xxx为方法名首字母大写。
+	示例代码如下：
+		public void validate(){
+				if(user.getUsername()==null || "".equals(user.getUsername())) {
+								  this.addFieldError("msg","用户名不能为空");
+							 }
+					}
+	前端jsp页面可以通过<s:property value="fieldErrors.msg[0]" /> 获取。
+	2、编写校验规则文件，在xwork-core-2.3.30.jar中com.opensymphony.xwork2.validator.validators包下有一个default.xml文件，该文件中配置了内置的校验器。
+	3、xml配置校验器的命名规则
+		1) 对一个Action所有请求进行校验 ActionClassName-validation.xml
+		2) 对Action中的某一个请求进行校验ActionClassName-ActionName-validation.xml
+		3) 对Action中的某一个方法不进行校验ActionClassName-validation.xml
+			 并对不进行校验的方法添加注解@SkipValidation
+			 
+Struts2常量配置:
+----struts常量既可以在struts.xml文件中配置，也可以在struts.properties文件中配置。
+	推荐在struts.xml中配置，保留在properties文件中配置是为了WebWork的向后兼容。
+	常用的常量：
+	struts.i18n.encoding:指定WEB应用的默认编码集，支持中文，可以配置GBK或UTF-8
+
+	struts.multipart.saveDir:指定上传文件保存的临时路径
+
+	struts.multipart.maxSize:指定上传文件的最大字节数
+
+	struts.action.extension:指定struts的请求后缀，默认值为action,指定多个后缀，用逗号分隔
+
+	struts.enable.DynamicMethodInvocation：是否支持动态方法调用，默认为true
+
+	struts.devMode:是否使用开发模式，如果为true,在程序出现异常的时候，出现更多的错误信息。

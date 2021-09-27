@@ -1,0 +1,98 @@
+**File
+**FileInputStream,FileOutputStream,BufferedInputStream,BufferedOutputStream(读取文件)
+**BufferedReader,BufferedWrite(读取文本)
+**当使用输出流是文件自动创建**
+
+--BufferedReader,BufferedWrite  extends Reader/Writer(字符流)
+	new BufferedReader(new FileReader()/new InputSteamReader())
+-[Method:(BufferedReader)]-
+	read(byte[] buf, int off, int len)	return int
+		 将字符对象的某一部分(BufferedReader)读入字符数组(buf)。
+		  buf:字符缓冲区
+		  off:开始位置,默认为0
+		  len:结束位置
+	readLine()	retrun String
+		读取一个文本行
+		Example: 
+			BufferedReader br = new BufferedReader(new FileReader(String url));
+			String data = null;	// 定义data来放值当前一行数据内容
+			while((data = br.readLine()) != null) {
+			
+			}
+-[Method:(BufferedWrite)]-		
+	write(char[] cbuf, int off, int len) 
+		写入字符数组的某一部分
+		Example:
+			BufferedWrite bw = new BufferedWrite(new FileWriter(String url));
+			byte[] buff = new byte[1024];	// 定义1M的字符缓冲区域
+			int len = 0;
+			while((len = bw.read(buff)) != -1) {// 将字符对象BufferedWrite读取1M的内容放入字符数组buff
+				bw.write(buffer, 0, b);	// 字符数组buff写入输出文件
+			}
+	flush() 
+		刷新该流的缓冲
+	newLine() 
+		写入一个行分隔符
+	
+	
+--File
+  new File(String path)
+  Method:exists()  return boolean
+								测试此抽象路径名表示的文件或目录是否存在。
+		 getParent() return String
+								返回此抽象路径名父目录的路径名字符串；如果此路径名没有指定父目录，则返回 null。
+		 getParentFile() return File
+								返回此抽象路径名父目录的抽象路径名；如果此路径名没有指定父目录，则返回 null。
+		 mkdir() return boolean	
+								创建此抽象路径名指定的目录	
+		 mkdirs() return boolean
+								创建此抽象路径名指定的目录，包括所有必需但不存在的父目录。
+		 list() return String[]
+								返回指定路径中文件及文件夹名字(包含文件类型后缀,不包含路径)
+		 listFiles() return File[]
+								返回一个抽象路径名数组，这些路径名表示此抽象路径名表示的目录中的文件。(包含路径,文件类型后缀)
+									***Important：电脑盘中隐藏盘符[System Volume Information]也会遍历出来，此时的File对象无法操作
+		 lastModified() return long 返回此抽象路径名表示的文件最后一次被修改的时间。(new SimpleDateFormat("format").format(new Date(long)))
+		 isDirectory()	return boolean
+								判断File对象是否为路径
+		 isFile()	return boolean	
+								判断File对象是否为文件
+
+--FileInputStream,FileOutputStream,BufferedInputStream,BufferedOutputStream
+  new BufferedInputStream(new FileInputStream(new File("url")))		
+  Method:read() 从此输入流中读取下一个数据字节。
+	如果使用缓冲区 
+	byte[] buf = new byte[1024]
+	int b = 0;
+	BufferedInputStream bis = new BufferedInputStream(new FileInputStream(new File("url")));	
+	BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File("url")));
+	while((b = bis.read(buf)) != -1) {
+		bos.write(buf, 0, b) //使用缓冲区在写出数据时不能使用bis.write(b),会丢失数据
+	}
+
+**ObjectStream(序列化)**
+	implents Serializable
+		类通过实现 java.io.Serializable 接口以启用其序列化功能。
+		未实现此接口的类将无法使其任何状态序列化或反序列化。
+		可序列化类的所有子类型本身都是可序列化的
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
